@@ -11811,91 +11811,93 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 const postsPerPage = 20; // 한 페이지에 보여줄 게시글 수
-    const buttonsPerBlock = 10; // 한 블록에 보여줄 페이지 버튼 수
-    let currentPage = 1;
+const buttonsPerBlock = 10; // 한 블록에 보여줄 페이지 버튼 수
+let currentPage = 1;
 
-    // 좋아요 수에 따라 게시글 정렬
-    const sortedPosts = posts.sort((a, b) => b.likes - a.likes);
+// 좋아요 수에 따른 게시글 정렬 로직을 제거합니다.
+// 이제 'posts' 배열은 원본 순서 그대로 사용됩니다.
 
-    const postListDiv = document.getElementById('post-list');
-    const paginationDiv = document.getElementById('pagination');
+const postListDiv = document.getElementById('post-list');
+const paginationDiv = document.getElementById('pagination');
 
-    function displayPosts(page) {
-        postListDiv.innerHTML = '';
-        currentPage = page;
-        const startIndex = (currentPage - 1) * postsPerPage;
-        const endIndex = startIndex + postsPerPage;
-        const postsToDisplay = sortedPosts.slice(startIndex, endIndex);
+function displayPosts(page) {
+    postListDiv.innerHTML = '';
+    currentPage = page;
+    const startIndex = (currentPage - 1) * postsPerPage;
+    const endIndex = startIndex + postsPerPage;
+    // 'sortedPosts' 대신 'posts' 배열을 사용합니다.
+    const postsToDisplay = posts.slice(startIndex, endIndex);
 
-        postsToDisplay.forEach(post => {
-            const postItem = document.createElement('div');
-            postItem.classList.add('post-item');
+    postsToDisplay.forEach(post => {
+        const postItem = document.createElement('div');
+        postItem.classList.add('post-item');
 
-            const postLink = document.createElement('a');
-            postLink.href = post.url;
-            postLink.target = "_blank"; // 새 탭에서 열기
-            postLink.textContent = post.title;
-            postItem.appendChild(postLink);
+        const postLink = document.createElement('a');
+        postLink.href = post.url;
+        postLink.target = "_blank"; // 새 탭에서 열기
+        postLink.textContent = post.title;
+        postItem.appendChild(postLink);
 
-            const likesSpan = document.createElement('span');
-            likesSpan.classList.add('likes');
-            likesSpan.textContent = post.likes;
-            postItem.appendChild(likesSpan);
+        const likesSpan = document.createElement('span');
+        likesSpan.classList.add('likes');
+        likesSpan.textContent = post.likes;
+        postItem.appendChild(likesSpan);
 
-            postListDiv.appendChild(postItem);
-        });
-        renderPagination();
-    }
+        postListDiv.appendChild(postItem);
+    });
+    renderPagination();
+}
 
-    function renderPagination() {
-        paginationDiv.innerHTML = '';
-        const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
+function renderPagination() {
+    paginationDiv.innerHTML = '';
+    // 'sortedPosts.length' 대신 'posts.length'를 사용합니다.
+    const totalPages = Math.ceil(posts.length / postsPerPage);
 
-        // 현재 페이지가 속한 버튼 블록의 시작 번호 계산
-        const startBlock = Math.floor((currentPage - 1) / buttonsPerBlock) * buttonsPerBlock + 1;
-        const endBlock = Math.min(startBlock + buttonsPerBlock - 1, totalPages);
+    // 현재 페이지가 속한 버튼 블록의 시작 번호 계산
+    const startBlock = Math.floor((currentPage - 1) / buttonsPerBlock) * buttonsPerBlock + 1;
+    const endBlock = Math.min(startBlock + buttonsPerBlock - 1, totalPages);
 
-        // '<<' (맨 처음) 버튼
-        const firstButton = document.createElement('button');
-        firstButton.textContent = '«';
-        firstButton.disabled = currentPage === 1;
-        firstButton.addEventListener('click', () => displayPosts(1));
-        paginationDiv.appendChild(firstButton);
+    // '<<' (맨 처음) 버튼
+    const firstButton = document.createElement('button');
+    firstButton.textContent = '«';
+    firstButton.disabled = currentPage === 1;
+    firstButton.addEventListener('click', () => displayPosts(1));
+    paginationDiv.appendChild(firstButton);
 
-        // '<' (이전 블록) 버튼
-        const prevBlockButton = document.createElement('button');
-        prevBlockButton.textContent = '<';
-        prevBlockButton.disabled = startBlock === 1;
-        prevBlockButton.addEventListener('click', () => displayPosts(Math.max(1, startBlock - buttonsPerBlock)));
-        paginationDiv.appendChild(prevBlockButton);
+    // '<' (이전 블록) 버튼
+    const prevBlockButton = document.createElement('button');
+    prevBlockButton.textContent = '<';
+    prevBlockButton.disabled = startBlock === 1;
+    prevBlockButton.addEventListener('click', () => displayPosts(Math.max(1, startBlock - buttonsPerBlock)));
+    paginationDiv.appendChild(prevBlockButton);
 
 
-        // 페이지 번호 버튼
-        for (let i = startBlock; i <= endBlock; i++) {
-            const pageButton = document.createElement('button');
-            pageButton.textContent = i;
-            if (i === currentPage) {
-                pageButton.classList.add('active');
-            }
-            pageButton.addEventListener('click', () => displayPosts(i));
-            paginationDiv.appendChild(pageButton);
+    // 페이지 번호 버튼
+    for (let i = startBlock; i <= endBlock; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        if (i === currentPage) {
+            pageButton.classList.add('active');
         }
-
-        // '>' (다음 블록) 버튼
-        const nextBlockButton = document.createElement('button');
-        nextBlockButton.textContent = '>';
-        nextBlockButton.disabled = endBlock === totalPages;
-        nextBlockButton.addEventListener('click', () => displayPosts(Math.min(totalPages, endBlock + 1)));
-        paginationDiv.appendChild(nextBlockButton);
-
-        // '>>' (맨 끝) 버튼
-        const lastButton = document.createElement('button');
-        lastButton.textContent = '»';
-        lastButton.disabled = currentPage === totalPages;
-        lastButton.addEventListener('click', () => displayPosts(totalPages));
-        paginationDiv.appendChild(lastButton);
+        pageButton.addEventListener('click', () => displayPosts(i));
+        paginationDiv.appendChild(pageButton);
     }
 
-    // 초기 게시글 로드
-    displayPosts(currentPage);
+    // '>' (다음 블록) 버튼
+    const nextBlockButton = document.createElement('button');
+    nextBlockButton.textContent = '>';
+    nextBlockButton.disabled = endBlock === totalPages;
+    nextBlockButton.addEventListener('click', () => displayPosts(Math.min(totalPages, endBlock + 1)));
+    paginationDiv.appendChild(nextBlockButton);
+
+    // '>>' (맨 끝) 버튼
+    const lastButton = document.createElement('button');
+    lastButton.textContent = '»';
+    lastButton.disabled = currentPage === totalPages;
+    lastButton.addEventListener('click', () => displayPosts(totalPages));
+    paginationDiv.appendChild(lastButton);
+}
+
+// 초기 게시글 로드
+displayPosts(currentPage);
 });
